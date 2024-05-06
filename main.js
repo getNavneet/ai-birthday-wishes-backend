@@ -1,31 +1,83 @@
 const express = require("express");
 const cors = require("cors");
+const bodyParser = require("body-parser"); // For JSON parsing
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-app.use(cors());
+let id = 1;
+let dataStore = []; //object value
+app.use(bodyParser.json());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://ai-wishes-test.vercel.app/"], // Adjust the port if necessary
+    methods: "GET,POST",
+    allowedHeaders: "Content-Type,Authorization",
+  }),
+);
 app.get("/share/:id", (req, res) => {
-  const messageId = req.params.id; // share/someId
-  const htmlContent = `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birthday Wishes for Rahul</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <h1>Birthday Wishes for ${messageId}</h1>
-    <p>This special message was generated just for you!</p>
-  </body>
-  </html>`;
+  const someId = req.params.id; // share/someId
+  const number = parseInt(someId.split("-")[1]);
+  console.log(number)
+  console.log("data is -")
+  console.log(dataStore)
+  const foundData = dataStore.find((item) => item.id === number);
+  console.log("foundData");
+  console.log(foundData);
+  
+  if (!foundData) {
+    res.status(404).json({ error: "Data not found" });
+    return
+  }
+  let htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Birthday Wishes for Rahul</title>
+      <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+      <h1>Birthday Wishes for ${foundData.name}</h1>
+      <p>This special message was generated just for you!${foundData.msg}</p>
+    </body>
+    </html>`;
+  // res.json(foundData);
 
   res.send(htmlContent);
+});
+
+app.post("/gen", (req, res) => {
+  try {
+    const data = req.body; // Access the parsed JSON data
+    let name = data.name;
+    const message = data.msg;
+    // const id = data.id;
+    name += `-${id}`;
+    dataStore.push({ id, ...data });
+    console.log(dataStore);
+    // Process the received data (name, message, and ID)
+    console.log("data received successfully");
+    // console.log("Received data:", name, message, id);
+
+    // Simulate some processing or data storage
+    
+    const processedData = {
+      url: `http://localhost:5173/share/${name}`,
+      url2: `https://ai-wishes-test.vercel.app/share/${name}`,
+      url3: `https://a607835b-65e9-42d1-8b19-5c28b6602f1c-00-zrl6pish6nk1.picard.replit.dev/share/${name}`,
+    };
+
+    res.json(processedData);
+    id++;
+  } catch (error) {
+    console.error("Error processing data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-// working fine till @link changed commit 
+//   https://your-frontend.vercel.app/share?name=uniqueIdentifier
