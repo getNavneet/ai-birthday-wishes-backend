@@ -79,6 +79,7 @@ app.post("/gen", (req, res) => {
 
     // Write data to file
     fs.writeFileSync(filePath, JSON.stringify(dataStorage));
+    fs.writeFileSync(filePath, JSON.stringify(dataStorage), { flag: 'w', encoding: 'utf8', mode: 0o666, flag: 'w', sync: true });
     // Process the received data (name, message, and ID)
 
     // console.log("Received data:", name, message, id);
