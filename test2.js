@@ -22,7 +22,6 @@ try {
 } catch (error) {
   console.error("Error:", error);
 }
-
   // Load existing data from file
   let dataStorage = JSON.parse(fs.readFileSync(filePath));
   console.log("Data loaded from data.json:", dataStorage);
@@ -66,7 +65,11 @@ app.post("/gen", (req, res) => {
   try {
     const { name, msg } = req.body;
       //split name with space and take first word only and also make it unique by adding some number
-    let slug = `${name}`; //improve it 
+        // Calculate the next available id
+    let id = Object.keys(dataStorage).length + 1;
+    console.log("Next available ID:", id);
+      const nm = (name.split(" ")[0]);
+    let slug = `${nm}-${id}`; 
     console.log("data received successfully");
     console.log("dataStorage is");
     console.log(dataStorage);
