@@ -1,9 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser"); // For JSON parsing
-
+const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.set("view engine", "ejs");
+// app.use(express.static("public")); // Set up a static directory for your CSS and JS files
+app.use(express.static(path.join(__dirname, 'public')));
 let id = 1;
 let dataStore = []; //object value
 app.use(bodyParser.json());
@@ -17,34 +20,23 @@ app.use(
 app.get("/share/:id", (req, res) => {
   const someId = req.params.id; // share/someId
   const number = parseInt(someId.split("-")[1]);
-  console.log(number)
-  console.log("data is -")
-  console.log(dataStore)
+  console.log(number);
+  console.log("data is -");
+  console.log(dataStore);
   const foundData = dataStore.find((item) => item.id === number);
-  console.log("foundData");
+  console.log("Data available");
   console.log(foundData);
-  
+
   if (!foundData) {
     res.status(404).json({ error: "Data not found" });
-    return
+    return;
+  } else if (foundData) {
+    res.render("index", {
+      id: foundData.id,
+      name: foundData.name,
+      msg: foundData.msg,
+    });
   }
-  let htmlContent = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Birthday Wishes for Rahul</title>
-      <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-      <h1>Birthday Wishes for ${foundData.name}</h1>
-      <p>This special message was generated just for you!${foundData.msg}</p>
-    </body>
-    </html>`;
-  // res.json(foundData);
-
-  res.send(htmlContent);
 });
 
 app.post("/gen", (req, res) => {
@@ -61,7 +53,7 @@ app.post("/gen", (req, res) => {
     // console.log("Received data:", name, message, id);
 
     // Simulate some processing or data storage
-    
+
     const processedData = {
       url: `http://localhost:5173/share/${name}`,
       url2: `https://ai-wishes-test.vercel.app/share/${name}`,
