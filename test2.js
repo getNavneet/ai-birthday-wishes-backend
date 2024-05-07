@@ -47,9 +47,9 @@ app.get("/share/:id", (req, res) => {
   // console.log(dataStorege);
   // const foundData = dataStore.find((item) => item.id === number);
 
-  if (dataStorage.hasOwnProperty(number)) {
+  if (dataStorage.hasOwnProperty(someId)) {
     console.log("Data available");
-    let foundData = dataStorage[number];
+    let foundData = dataStorage[someId];
     console.log(foundData);
     res.render("index", {
       id: "id goes here",
@@ -65,8 +65,8 @@ app.get("/share/:id", (req, res) => {
 app.post("/gen", (req, res) => {
   try {
     const { name, msg } = req.body;
-
-    let slug = `${name}-${id}`;
+      //split name with space and take first word only and also make it unique by adding some number
+    let slug = `${name}`; //improve it 
     console.log("data received successfully");
     console.log("dataStorage is");
     console.log(dataStorage);
